@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Scrollbar</title>
+
+    <!--引入jQuery-->
+    <script src="http://cdn.bootcss.com/jquery/3.2.1/jquery.js"></script>
+</head>
+<body>
+
+<!--
+    外容器
+    给定了最大高度，设置竖直方向溢出时不显示，设置border以方便查看效果，设置position以配合自定义滚动条的
+-->
+<div id="wrapper" style="overflow-y: hidden;max-height: 500px;position: relative;border: 1px solid black;">
+
+    <!--
+        自定义的滚动条
+        设置z-index显示在最顶层，设置初始完全透明
+    -->
+    
+<p>设置z-index显示在最顶层</p>
+<p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p><p>设置z-index显示在最顶层</p>
+设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明设置z-index显示在最顶层，设置初始完全透明
+       
+    <div id="scrollbar" style="box-sizing:border-box;position:absolute;right:0;height:100%;z-index:100;opacity:0;padding:4px;width: 18px;">
+ <!--
+            自定义滚动条的滚轮
+            移动方式为：设置position：relative，通过设置top来上下移动，设置border-radius美化外观
+        -->
+        <div id="scrollbar_roller" style="position:relative;top: 0px;width:100%;background-color:lightgray;border-radius:5px;"></div>
+    </div>
+
+    <!--
+        容器包裹的内容
+        此处为方便查看效果设置height
+    -->
+    <div id="content" style="width:100%;height: 2000px;">
+    </div>
+</div>
+
+
+<script>
+
+    //当前可视区域高度
+    var visibleHeight = $('#wrapper').height();
+    //可视区域最大可达到的高度
+    var maxVisibleHeight = 500;
+    //鼠标滚轮一次滚动对应的高度
+    var rollHeight = 200;
+    //超出可视区域顶部的部分的高度
+    var topHeight = 0;
+    //超出可视区域底部的部分的高度
+    var elseHeight = 0;
+
+    //向上滚动时触发的函数
+    var upScrollFunc = function (e) {
+
+        //获取当前可视区域的高度
+        visibleHeight = $('#wrapper').height();
+
+        if (visibleHeight == maxVisibleHeight) {
+            //此时当前可视区域高度已达到可允许的最大高度，说明表格的实际高度大于显示高度（暂不考虑等于）
+            if ($('#content').height() > visibleHeight) {
+
+                //当滚动条高度发生变化时，或初始化滚动条高度时，设置滚动条滚轮的高度
+                $('#scrollbar_roller').css('height', Math.round($('#scrollbar').height() * visibleHeight / $('#content').height()) + 'px');
+
+                if (topHeight == 0) {
+                    //topHeight为0，说明此时没发生过向下滚动事件
+
+                    //为table位移做准备
+                    $('#content').css({'position': 'relative', 'top': '0px'});
+
+                    //超出可视区域底部的高度=内容高度-当前可视区域高度（可视区域最大可达到的高度）
+                    elseHeight = $('#content').height() - visibleHeight;
+
+                    //stop停止自定义滚动条当前的动画，并slow设置滚动条透明度从0到1，完成后在2s内从1到0
+                    $('#scrollbar').stop().animate({opacity: "1"}, 'fast', function () {
+                        $('#scrollbar').stop().animate({opacity: "0"}, 'slow');
+                    });
+
+                    //设置滚动条到顶上
+                    $('#scrollbar_roller').animate({'top': '0px'}, 1);
+
+                } else if (topHeight > rollHeight) {
+                    //有topHeight，说明之前已经发生过向下滚动事件，
+                    //判断：如果滚动的幅度大于一次位移的标准幅度
+
+                    //避免里面滚动条滚动时外面的页面也在滚动
+                    e.preventDefault();
+
+                    //topHeight-一次标准位移幅度
+                    topHeight -= rollHeight;
+
+                    //内容div向上滚动一次标准位移幅度
+                    $('#content').css({'position': 'relative', 'top': '-' + topHeight + 'px'});
+
+                    //底部不可见部分高度增加一次标准位移幅度
+                    elseHeight += rollHeight;
+
+                    //滚动条top设为相应比例的位移，显示滚动条并缓缓消失
+                    $('#scrollbar').stop().animate({opacity: "1"}, 'fast', function () {
+                        $('#scrollbar').stop().animate({opacity: "0"}, 'slow');
+                    });
+                    $('#scrollbar_roller').animate({'top': Math.round($('#scrollbar').height() * topHeight / $('#content').height()) + 'px'}, 1);
+
+                } else if (topHeight <= rollHeight) {
+                    //滚动幅度小于一次位移标准幅度，则说明此时再向上滚动直接滚到顶了
+
+                    //避免里面滚动条滚动时外面的页面也在滚动
+                    e.preventDefault();
+
+                    //归零top，topHeight，设置新的elseHeight
+                    $('#content').css({'position': 'relative', 'top': '0px'});
+                    topHeight = 0;
+                    elseHeight = $('#content').height() - visibleHeight;
+
+                    //直接设置滚动条top为0
+                    $('#scrollbar').stop().animate({opacity: "1"}, 'fast', function () {
+                        $('#scrollbar').stop().animate({opacity: "0"}, 'slow');
+                    });
+                    $('#scrollbar_roller').animate({'top': '0px'}, 1);
+
+                }
+
+            }
+        } else {
+            //此时内容div还未填充满容器div，滚动条不显示
+            $('#scrollbar').css('height', '0px');
+            $('#scrollbar_roller').css({'height': '0px', 'top': '0px'});
+        }
+
+    }
+
+    //向下滚动时触发的函数
+    var downScrollFunc = function (e) {
+
+        visibleHeight = $('#wrapper').height();
+
+        if (visibleHeight == maxVisibleHeight) {
+
+            if ($('#content').height() > visibleHeight) {
+
+                //当滚动条高度发生变化时，或初始化滚动条高度时，设置滚动条高度
+                $('#scrollbar_roller').css('height', Math.round($('#scrollbar').height() * visibleHeight / $('#content').height()) + 'px');
+
+                //如果两者都为0，说明此时页面刚加载
+                //初始化elseHeight
+                if (elseHeight == 0 && topHeight == 0) {
+                    elseHeight = $('#content').height() - visibleHeight;
+                }
+
+                if (elseHeight == 0) {
+                    //已滚到内容div最底部
+                    topHeight = $('#content').height() - visibleHeight;
+
+                    $('#content').css({'position': 'relative', 'top': '-' + topHeight + 'px'});
+
+                    $('#scrollbar').stop().animate({opacity: "1"}, 'fast', function () {
+                        $('#scrollbar').stop().animate({opacity: "0"}, 'slow');
+                    });
+                } else if (elseHeight > rollHeight) {
+                    //至少还可以完整的滚一次
+                    e.preventDefault();
+
+                    topHeight += rollHeight;
+                    $('#content').css({'position': 'relative', 'top': '-' + topHeight + 'px'});
+                    elseHeight -= rollHeight;
+
+                    //根据当前相应的位移比例设置滚动条的top，并让滚动条显示后缓缓消失
+                    $('#scrollbar').stop().animate({opacity: "1"}, 'fast', function () {
+                        $('#scrollbar').stop().animate({opacity: "0"}, 'slow');
+                    });
+                    $('#scrollbar_roller').animate({'top': Math.round((topHeight / $('#content').height()) * $('#scrollbar').height()) + 'px'}, 1);
+
+                } else if (elseHeight <= rollHeight) {
+                    //只能不完整地滚一次滚到底
+                    e.preventDefault();
+
+                    //设置elseHeight为0
+                    elseHeight = 0;
+
+                    //topHeight直接设置为table整体高度-当前可见部分的高度
+                    topHeight = $('#content').height() - visibleHeight;
+
+                    //用新的topHeight设置table的top
+                    $('#content').css({'position': 'relative', 'top': '-' + topHeight + 'px'});
+
+                    //设置滚动条top为（滚动条父级div-滚动条高度），并让滚动条显示后缓缓消失
+                    $('#scrollbar').stop().animate({opacity: "1"}, 'fast', function () {
+                        $('#scrollbar').stop().animate({opacity: "0"}, 'slow');
+                    });
+                    $('#scrollbar_roller').animate({'top': $('#scrollbar').height() - $('#scrollbar_roller').height() + 'px'}, 1);
+                }
+
+            }
+        } else {
+            $('#scrollbar').css('height', '0px');
+            $('#scrollbar_roller').css({'height': '0px', 'top': '0px'});
+        }
+
+    }
+
+    //滚动方法
+    var scrollFunc = function (e) {
+
+        //浏览器兼容性适配
+        e = e || window.event;
+
+        if (e.wheelDelta) { //其他浏览器支持的属性
+
+            if (e.wheelDelta > 0) { //当滑轮向上滚动时
+                upScrollFunc(e);
+            }
+            if (e.wheelDelta < 0) { //当滑轮向下滚动时
+                downScrollFunc(e);
+            }
+        } else if (e.detail) {  //火狐浏览器支持的属性
+
+            if (e.detail< 0) { //当滑轮向上滚动时
+                upScrollFunc(e);
+            }
+            if (e.detail> 0) { //当滑轮向下滚动时
+                downScrollFunc(e);
+            }
+        }
+    }
+
+    //绑定滚动方法
+    if ($('#content')[0].addEventListener) {
+        //非firefox
+        $('#content')[0].addEventListener('mousewheel', scrollFunc, false);
+
+        //firefox
+        $('#content')[0].addEventListener('DOMMouseScroll', scrollFunc, false);
+    }
+
+    //注意，此处content本来是不能加resize的，实际开发中没有发现这个问题，可能是框架自带了吧，
+    //于是搜到了这个方法，添加进来后就可以给content这个div加resize事件了
+    (function($, h, c) {
+        var a = $([]), e = $.resize = $.extend($.resize, {}), i, k = "setTimeout", j = "resize", d = j
+            + "-special-event", b = "delay", f = "throttleWindow";
+        e[b] = 350;
+        e[f] = true;
+        $.event.special[j] = {
+            setup : function() {
+                if (!e[f] && this[k]) {
+                    return false
+                }
+                var l = $(this);
+                a = a.add(l);
+                $.data(this, d, {
+                    w : l.width(),
+                    h : l.height()
+                });
+                if (a.length === 1) {
+                    g()
+                }
+            },
+            teardown : function() {
+                if (!e[f] && this[k]) {
+                    return false
+                }
+                var l = $(this);
+                a = a.not(l);
+                l.removeData(d);
+                if (!a.length) {
+                    clearTimeout(i)
+                }
+            },
+            add : function(l) {
+                if (!e[f] && this[k]) {
+                    return false
+                }
+                var n;
+                function m(s, o, p) {
+                    var q = $(this), r = $.data(this, d);
+                    r.w = o !== c ? o : q.width();
+                    r.h = p !== c ? p : q.height();
+                    n.apply(this, arguments)
+                }
+                if ($.isFunction(l)) {
+                    n = l;
+                    return m
+                } else {
+                    n = l.handler;
+                    l.handler = m
+                }
+            }
+        };
+        function g() {
+            i = h[k](function() {
+                a.each(function() {
+                    var n = $(this), m = n.width(), l = n.height(), o = $
+                        .data(this, d);
+                    if (m !== o.w || l !== o.h) {
+                        n.trigger(j, [ o.w = m, o.h = l ])
+                    }
+                });
+                g()
+            }, e[b])
+        }
+    })(jQuery, this);
+
+    //内容div的resize事件
+    $('#content').resize(function(){
+
+        alert('test');
+        //resize发生时，已溢出
+        if(visibleHeight == maxVisibleHeight){
+            //如果table高度发生变化
+            if($('#content').height() !== $('#wrapper').data('#content_height')){
+                //计算对应之前比例的新topHeight
+                topHeight *= $('#content').height()/$('#wrapper').data('content_height');
+
+                $('#scrollbar_roller').css('height', Math.round($('#scrollbar').height()*visibleHeight/$('#content').height())+'px');
+            }
+        }else{
+            topHeight=0;
+            $('#scrollbar').css('height','0px');
+            $('#scrollbar_roller').css({'height':'0px','top':'0px'});
+        }
+        //如果底部出现了空白
+        if (topHeight + visibleHeight > $('#content').height()) {
+            //滚动条移动到底部
+            topHeight = $('#content').height() - visibleHeight;
+        }
+        elseHeight = $('#content').height() - topHeight - visibleHeight;
+        $('#content').css({'position': 'relative', 'top': '-' + topHeight + 'px'});
+
+        //设置当前table高度为新data数据
+        $('#wrapper').data('content_height',$('#content').height());
+
+    });
+
+
+    //-----------------滚动条拖动-----------------
+    //记录滚动条区域mousedown事件时鼠标滚轮的top
+    var topPlace=0;
+    //记录滚动条区域mousedown事件时鼠标的点击处的pageY
+    var topPointY=0;
+
+    //鼠标在滚动条范围时，鼠标slow完全不透明
+    $('#scrollbar_roller').mouseover(function () {
+        $('#scrollbar').stop().animate({opacity:"1"}, 'fast');
+    });
+
+    //鼠标移出滚动条范围时，鼠标slow完全透明
+    $('#scrollbar_roller').mouseleave(function () {
+        $('#scrollbar').stop().animate({opacity:"0"},"slow");
+    });
+
+    //滚动条区域mousedown事件
+    //按住滚轮时，记录此时的pageY和top
+    $('#scrollbar_roller').mousedown(function (event) {
+        topPlace=$('#scrollbar_roller').css('top');
+        topPlace=parseInt(topPlace.substr(0, topPlace.length-2));
+        topPointY=event.pageY;
+
+        //忘了是干嘛的了？阻止事件冒泡？
+        return false;
+    });
+
+    //滚动条区域mousemove事件，表格区域mousemove事件
+    $('#scrollbar_roller').mousemove(function (event) {
+        //兼容性设置
+        event = event || window.event;
+
+        //神坑，firefox中event.which不点鼠标和点鼠标左键都是1，幸亏还有event.buttons
+        if(event.buttons == 1){
+
+            //计算出滚动新的top，move时的pageY-down时的pageY就是位移。
+            var newPlace=topPlace+event.pageY-topPointY;
+            var ceilLimit=$('#scrollbar').height()-$('#scrollbar_roller').height();
+
+            if(newPlace>0 && newPlace<ceilLimit){
+                $('#scrollbar_roller').css('top',newPlace+'px');
+                topHeight=newPlace/$('#scrollbar').height()*$('#content').height();
+                elseHeight=$('#content').height()-topHeight-maxVisibleHeight;
+                $('#content').css({'position':'relative','top':'-'+topHeight+'px'});
+            }else if(newPlace<=0){
+                $('#scrollbar_roller').css('top','0px');
+                topHeight=0;
+                elseHeight=$('#content').height()-maxVisibleHeight;
+                $('#content').css({'position':'relative','top':'0px'});
+            }else if(newPlace>=ceilLimit){
+                $('#scrollbar_roller').css('top', ceilLimit+'px');
+                topHeight=$('#content').height()-maxVisibleHeight;
+                elseHeight=0;
+                $('#content').css({'position':'relative','top':'-'+($('#content').height()-maxVisibleHeight)+'px'});
+            }
+
+        }
+    });
+
+    $('#wrapper').mousemove(function (event) {
+
+        event = event || window.event;
+
+        //如果鼠标移动的时候还按着鼠标左键
+        if(event.buttons==1 && topPointY){
+            $('#scrollbar').stop().css({'opacity':'1'});
+            //滚动条将要位移到的新位置，以top为定义
+            var newPlace=topPlace+event.pageY-topPointY;
+            //newplace的天花板，最大位移不能超过天花板
+            var ceilLimit=$('#scrollbar').height()-$('#scrollbar_roller').height();
+
+            //如果位移后newplace在top取值范围内
+            if(newPlace>0 && newPlace<ceilLimit){
+                $('#scrollbar_roller').css('top',newPlace+'px');
+                topHeight=newPlace/$('#scrollbar').height()*$('#content').height();
+                elseHeight=$('#content').height()-topHeight-maxVisibleHeight;
+                $('#content').css({'position':'relative','top':'-'+topHeight+'px'});
+            }else if(newPlace<=0){  //newplace超出顶部
+                $('#scrollbar_roller').css('top','0px');
+                topHeight=0;
+                elseHeight=$('#content').height()-maxVisibleHeight;
+                $('#content').css({'position':'relative','top':'0px'});
+            }else if(newPlace>=ceilLimit){  //newplace超出底部
+                $('#scrollbar_roller').css('top', ceilLimit+'px');
+                topHeight=$('#content').height()-maxVisibleHeight;
+                elseHeight=0;
+                $('#content').css({'position':'relative','top':'-'+($('#content').height()-maxVisibleHeight)+'px'});
+            }
+        }
+    });
+
+    //页面内mouseup事件
+    $('body').mouseup(function () {
+        topPlace=0;
+        topPointY=0;
+        $('#scrollbar').stop().animate({opacity:"0"},"slow");
+    });
+
+    //页面内mouseLeave事件
+    $('body').mouseleave(function () {
+        $('#scrollbar').stop().animate({opacity:"0"},"slow");
+    });
+</script>
+</body>
+</html>
