@@ -2,18 +2,14 @@
 
 模拟 mip-toast 测试组件，模拟抛出事件
 
-| 标题     | 内容 |
-| -------- | ---- |
-| 类型     |
-| 支持布局 |
-| 所需脚本 |
+| 可用测试组件 | https://caoru828.github.io/my_json/mip-test/mip-test.js
 
 ## 说明
 
-向 toast 组件抛出事件
-抛出事件 show 或 hidden 事件 eg: this.$emit('show') eg: this.$emit('hidden')
-静态传参数：直接在 toast 组件里 info-text 后边加字符串 eg: this.$emit('show')
-动态传参数：抛出 show 事件可以传参数，传的参数就是想要显示的参数 eg: this.$emit('show', showString)
+|向 toast | 组件抛出事件|
+|抛出事件 show 或 hidden 事件 | eg: this.$emit('show') eg: this.$emit('hidden')|
+|静态传参数：直接在 toast 组件里 info-text 后边加字符串 |eg: this.$emit('show')|
+|动态传参数：抛出 show 事件可以传参数，传的参数就是想要显示的参数 |eg: this.$emit('show', showString)|
 
 ## 示例
 
@@ -86,4 +82,6 @@ export default {
 
 ## 属性
 
-this.$emit('show', showString); 动态传参数，第二个参数可以是字符串也可以是变量
+this.$emit('show', showString); 
+
+动态传参数，第二个参数可以是字符串也可以是变量
